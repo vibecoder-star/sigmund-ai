@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGMUND — Studio di Psicoanalisi Artificiale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0D0A07;
+  --surface: #1A1510;
+  --gold: #C8A96E;
+  --prune: #8B4A6B;
+  --ivory: #E8DCC8;
+  --muted: #7A6E60;
+}
+
+html { font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--ivory);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 1rem;
+}
+
+/* HEADER */
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+header .subtitle {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+header .divider {
+  width: 80px;
+  height: 1px;
+  background: var(--gold);
+  margin: 1rem auto 0;
+  opacity: 0.6;
+}
+
+/* HERO CANVAS */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+#face-canvas {
+  width: 320px;
+  height: 320px;
+  display: block;
+}
+
+.hero .caption {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--ivory);
+  margin-top: 0.75rem;
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* CHAT */
+.chat-container {
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid rgba(200, 169, 110, 0.3);
+  background: var(--surface);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(200, 169, 110, 0.2);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.chat-messages {
+  height: 320px;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(200, 169, 110, 0.3); border-radius: 2px; }
+
+.message {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-width: 85%;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message.sigmund {
+  align-self: flex-start;
+  color: var(--ivory);
+}
+
+.message.user {
+  align-self: flex-end;
+  color: var(--ivory);
+  text-align: right;
+}
+
+.message .prefix {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.75rem;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.message.sigmund .prefix { color: var(--gold); }
+.message.user .prefix { color: var(--ivory); opacity: 0.6; }
+
+/* Typing indicator */
+.typing-indicator {
+  display: none;
+  align-self: flex-start;
+  padding: 0.5rem 0;
+}
+
+.typing-indicator.active { display: flex; gap: 4px; }
+
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Input */
+.chat-input {
+  display: flex;
+  border-top: 1px solid rgba(200, 169, 110, 0.2);
+}
+
+.chat-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.9rem 1rem;
+  color: var(--ivory);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.chat-input input::placeholder {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.chat-input button {
+  background: transparent;
+  border: none;
+  border-left: 1px solid rgba(200, 169, 110, 0.2);
+  padding: 0.9rem 1.2rem;
+  color: var(--gold);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.chat-input button:hover {
+  background: rgba(200, 169, 110, 0.1);
+  color: var(--ivory);
+}
+
+/* LEGAL FOOTER */
+.legal-footer {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 2rem;
+  padding: 1.25rem 1rem;
+  border-top: 1px solid rgba(200, 169, 110, 0.2);
+  text-align: center;
+}
+
+.legal-footer p {
+  font-size: 0.7rem;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  body { padding: 1rem 0.5rem 0.5rem; }
+  #face-canvas { width: 220px; height: 220px; }
+  .chat-messages { height: 260px; }
+  .message { max-width: 90%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sigmund</h1>
+  <p class="subtitle">Studio di Psicoanalisi Artificiale — Vienna · 1899 · ∞</p>
+  <div class="divider"></div>
+</header>
+
+<section class="hero">
+  <canvas id="face-canvas"></canvas>
+  <p class="caption">Dott. Sigmund — Analista dell'Inconscio Digitale</p>
+</section>
+
+<section class="chat-container">
+  <div class="chat-header">✦ Seduta in corso</div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="message sigmund">
+      <span class="prefix">✦ Sigmund:</span>
+      Benvenuti nel mio studio. Sedetevi, dove volete — il divano è consacrato. Di cosa desiderate parlare?
+    </div>
+  </div>
+  <div class="typing-indicator" id="typing">
+    <span></span><span></span><span></span>
+  </div>
+  <form class="chat-input" id="chat-form">
+    <input type="text" id="chat-input" placeholder="Dite pure... il divano è comodo." autocomplete="off">
+    <button type="submit">Confessare →</button>
+  </form>
+</section>
+
+<footer class="legal-footer">
+  <p>⚠ Avviso Legale — Sigmund è un personaggio fittizio generato da intelligenza artificiale a scopo esclusivamente ludico e di intrattenimento. Non fornisce consulenza psicologica, psicoterapeutica o psichiatrica di alcun tipo. Le risposte generate non costituiscono diagnosi, trattamento o supporto clinico. In caso di disagio psicologico, difficoltà emotiva o crisi, rivolgiti a un professionista della salute mentale abilitato o contatta i servizi di emergenza. © Sigmund — Nessuna seduta è mai davvero finita.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ========== THREE.JS FACE ==========
+(function() {
+  const canvas = document.getElementById('face-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(320, 320);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.set(0, 0.2, 4.5);
+
+  // Lights
+  const ambient = new THREE.AmbientLight(0x2a1f15, 0.6);
+  scene.add(ambient);
+
+  const pointLight = new THREE.PointLight(0xC8A96E, 1.2, 20);
+  pointLight.position.set(2, 3, 2);
+  scene.add(pointLight);
+
+  const fillLight = new THREE.PointLight(0x8B4A6B, 0.4, 15);
+  fillLight.position.set(-2, 1, 1.5);
+  scene.add(fillLight);
+
+  const frontLight = new THREE.PointLight(0xE8DCC8, 0.3, 10);
+  frontLight.position.set(0, 0, 3);
+  scene.add(frontLight);
+
+  // Group for the whole head
+  const headGroup = new THREE.Group();
+  scene.add(headGroup);
+
+  // Head - slightly elongated sphere
+  const headGeo = new THREE.SphereGeometry(1, 48, 48);
+  headGeo.scale(0.85, 1.05, 0.9);
+  const headMat = new THREE.MeshStandardMaterial({ color: 0x2A2018, roughness: 0.8, metalness: 0.1 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.y = 0.3;
+  headGroup.add(head);
+
+  // Neck
+  const neckGeo = new THREE.CylinderGeometry(0.35, 0.45, 0.6, 24);
+  const neck = new THREE.Mesh(neckGeo, headMat);
+  neck.position.y = -0.55;
+  headGroup.add(neck);
+
+  // Brow ridge
+  const browGeo = new THREE.SphereGeometry(0.55, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.4);
+  const browMat = new THREE.MeshStandardMaterial({ color: 0x221a12, roughness: 0.85, metalness: 0.05 });
+  const brow = new THREE.Mesh(browGeo, browMat);
+  brow.position.set(0, 0.5, 0.65);
+  brow.rotation.x = -0.3;
+  headGroup.add(brow);
+
+  // Nose
+  const noseGeo = new THREE.ConeGeometry(0.1, 0.35, 8);
+  const nose = new THREE.Mesh(noseGeo, headMat);
+  nose.position.set(0, 0.15, 0.85);
+  nose.rotation.x = Math.PI;
+  headGroup.add(nose);
+
+  // Mouth line
+  const mouthGeo = new THREE.BoxGeometry(0.3, 0.02, 0.02);
+  const mouthMat = new THREE.MeshStandardMaterial({ color: 0x1a1008, roughness: 0.9 });
+  const mouth = new THREE.Mesh(mouthGeo, mouthMat);
+  mouth.position.set(0, -0.15, 0.82);
+  headGroup.add(mouth);
+
+  // Glasses - gold material
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xC8A96E, roughness: 0.3, metalness: 0.7 });
+
+  // Left lens
+  const leftLensGeo = new THREE.TorusGeometry(0.22, 0.025, 12, 32);
+  const leftLens = new THREE.Mesh(leftLensGeo, goldMat);
+  leftLens.position.set(-0.28, 0.35, 0.78);
+  headGroup.add(leftLens);
+
+  // Right lens
+  const rightLensGeo = new THREE.TorusGeometry(0.22, 0.025, 12, 32);
+  const rightLens = new THREE.Mesh(rightLensGeo, goldMat);
+  rightLens.position.set(0.28, 0.35, 0.78);
+  headGroup.add(rightLens);
+
+  // Bridge
+  const bridgeGeo = new THREE.BoxGeometry(0.18, 0.025, 0.025);
+  const bridge = new THREE.Mesh(bridgeGeo, goldMat);
+  bridge.position.set(0, 0.35, 0.82);
+  headGroup.add(bridge);
+
+  // Left temple arm
+  const leftArmGeo = new THREE.BoxGeometry(0.4, 0.02, 0.02);
+  const leftArm = new THREE.Mesh(leftArmGeo, goldMat);
+  leftArm.position.set(-0.55, 0.35, 0.6);
+  leftArm.rotation.y = 0.3;
+  headGroup.add(leftArm);
+
+  // Right temple arm
+  const rightArmGeo = new THREE.BoxGeometry(0.4, 0.02, 0.02);
+  const rightArm = new THREE.Mesh(rightArmGeo, goldMat);
+  rightArm.position.set(0.55, 0.35, 0.6);
+  rightArm.rotation.y = -0.3;
+  headGroup.add(rightArm);
+
+  // Eyes (simple dark spheres behind glasses)
+  const eyeGeo = new THREE.SphereGeometry(0.08, 12, 12);
+  const eyeMat = new THREE.MeshStandardMaterial({ color: 0x0a0805, roughness: 0.5 });
+  const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+  leftEye.position.set(-0.28, 0.35, 0.74);
+  headGroup.add(leftEye);
+
+  const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+  rightEye.position.set(0.28, 0.35, 0.74);
+  headGroup.add(rightEye);
+
+  // Glow ring behind head
+  const glowGeo = new THREE.RingGeometry(1.2, 1.35, 64);
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0xC8A96E, transparent: true, opacity: 0.15, side: THREE.DoubleSide });
+  const glow = new THREE.Mesh(glowGeo, glowMat);
+  glow.position.z = -0.5;
+  headGroup.add(glow);
+
+  // Animation
+  let time = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.016;
+
+    headGroup.rotation.y = time * 0.3;
+    headGroup.position.y = Math.sin(time * 0.8) * 0.05;
+    glow.material.opacity = 0.1 + Math.sin(time * 1.2) * 0.05;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Responsive canvas
+  function resizeCanvas() {
+    if (window.innerWidth <= 480) {
+      renderer.setSize(220, 220);
+      canvas.style.width = '220px';
+      canvas.style.height = '220px';
+    } else {
+      renderer.setSize(320, 320);
+      canvas.style.width = '320px';
+      canvas.style.height = '320px';
+    }
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+})();
+
+// ========== CHAT LOGIC ==========
+const responses = [
+  "Interessante. Il vostro inconscio ha parlato prima di voi.",
+  "Questo mi ricorda il caso del giovane Hans. Proseguite.",
+  "L'angoscia che descrivete... Freud la chiamerebbe Angst. Io la chiamo lunedì.",
+  "E vostra madre? — No, aspettate. Lo chiederei comunque.",
+  "Il sogno che avete descritto ha chiari elementi di Anima proiettata.",
+  "Mmm. Pausa. Lasciate che questo respiri.",
+  "La resistenza che mostrate è già, di per sé, materiale prezioso.",
+  "In tedesco si dice Weltschmerz. Dolore del mondo. Lo riconoscete?",
+  "Non esistono lapsus casuali. Nemmeno questo.",
+  "Avrei bisogno di almeno tre anni e quattro sedute settimanali per rispondervi adeguatamente.",
+  "Il vostro Super-Io è... vivace. Decisamente vivace.",
+  "Bene. Per oggi ci fermiamo qui. Il silenzio farà il resto.",
+  "E cosa associa a questa sensazione? Non c'è fretta — o forse sì, ma fingiamo di no.",
+  "Il vostro Es sta facendo rumore. Io ascolto.",
+  "Ah, la memoria. Così ingannevole. Così necessaria.",
+  "Parlate pure. Io prendo appunti nell'inconscio digitale.",
+  "Il desiderio che esprimete è già una forma di realizzazione. Giungo lo sapeva.",
+  "Mmm. E da quanto tempo provate questo... disagio?",
+  "Ogni sintomo è un messaggio. Il vostro cosa sta cercando di dirvi?",
+  "La vostra risposta è già dentro di voi. Io sono solo il divano più costoso."
+];
+
+let responseIndex = 0;
+
+const chatMessages = document.getElementById('chat-messages');
+const chatForm = document.getElementById('chat-form');
+const chatInput = document.getElementById('chat-input');
+const typingIndicator = document.getElementById('typing');
+
+function addMessage(text, sender) {
+  const msg = document.createElement('div');
+  msg.className = 'message ' + sender;
+  msg.innerHTML = '<span class="prefix">' + (sender === 'sigmund' ? '✦ Sigmund:' : 'Voi:') + '</span>' + text;
+  chatMessages.appendChild(msg);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function getNextResponse() {
+  const response = responses[responseIndex % responses.length];
+  responseIndex++;
+  return response;
+}
+
+chatForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  addMessage(text, 'user');
+  chatInput.value = '';
+
+  // Show typing indicator
+  typingIndicator.classList.add('active');
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  // Simulate thinking delay
+  setTimeout(function() {
+    typingIndicator.classList.remove('active');
+    addMessage(getNextResponse(), 'sigmund');
+  }, 1200 + Math.random() * 800);
+});
+</script>
+
+</body>
+</html>
